@@ -33,13 +33,13 @@
             label2 = new Label();
             dataGridView2 = new DataGridView();
             groupBox1 = new GroupBox();
-            button5 = new Button();
+            acceptButton = new Button();
             label1 = new Label();
             textBox1 = new TextBox();
-            radioButton4 = new RadioButton();
-            radioButton3 = new RadioButton();
-            radioButton2 = new RadioButton();
-            radioButton1 = new RadioButton();
+            renameFileRadio = new RadioButton();
+            deleteFileRadio = new RadioButton();
+            uploadFileRadio = new RadioButton();
+            createFileRadio = new RadioButton();
             tabControl2 = new TabControl();
             tabPage3 = new TabPage();
             button7 = new Button();
@@ -116,30 +116,31 @@
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(button5);
+            groupBox1.Controls.Add(acceptButton);
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(textBox1);
-            groupBox1.Controls.Add(radioButton4);
-            groupBox1.Controls.Add(radioButton3);
-            groupBox1.Controls.Add(radioButton2);
-            groupBox1.Controls.Add(radioButton1);
+            groupBox1.Controls.Add(renameFileRadio);
+            groupBox1.Controls.Add(deleteFileRadio);
+            groupBox1.Controls.Add(uploadFileRadio);
+            groupBox1.Controls.Add(createFileRadio);
             groupBox1.Location = new Point(8, 19);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(374, 207);
             groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
-            groupBox1.Text = "groupBox1";
+            groupBox1.Text = "Actions with DataBase";
             // 
-            // button5
+            // acceptButton
             // 
-            button5.Enabled = false;
-            button5.FlatStyle = FlatStyle.Flat;
-            button5.Location = new Point(168, 163);
-            button5.Name = "button5";
-            button5.Size = new Size(195, 23);
-            button5.TabIndex = 2;
-            button5.Text = "Accept";
-            button5.UseVisualStyleBackColor = true;
+            acceptButton.Enabled = false;
+            acceptButton.FlatStyle = FlatStyle.Flat;
+            acceptButton.Location = new Point(197, 163);
+            acceptButton.Name = "acceptButton";
+            acceptButton.Size = new Size(166, 23);
+            acceptButton.TabIndex = 2;
+            acceptButton.Text = "Accept";
+            acceptButton.UseVisualStyleBackColor = true;
+            acceptButton.Click += acceptButton_Click;
             // 
             // label1
             // 
@@ -155,52 +156,58 @@
             textBox1.Enabled = false;
             textBox1.Location = new Point(6, 163);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(142, 23);
+            textBox1.Size = new Size(175, 23);
             textBox1.TabIndex = 5;
+            textBox1.TextChanged += textBox1_TextChanged;
+            textBox1.KeyPress += textBox1_KeyPress;
             // 
-            // radioButton4
+            // renameFileRadio
             // 
-            radioButton4.AutoSize = true;
-            radioButton4.Location = new Point(6, 107);
-            radioButton4.Name = "radioButton4";
-            radioButton4.Size = new Size(138, 19);
-            radioButton4.TabIndex = 4;
-            radioButton4.TabStop = true;
-            radioButton4.Text = "Rename file DataBase";
-            radioButton4.UseVisualStyleBackColor = true;
+            renameFileRadio.AutoSize = true;
+            renameFileRadio.Location = new Point(6, 107);
+            renameFileRadio.Name = "renameFileRadio";
+            renameFileRadio.Size = new Size(138, 19);
+            renameFileRadio.TabIndex = 4;
+            renameFileRadio.TabStop = true;
+            renameFileRadio.Text = "Rename file DataBase";
+            renameFileRadio.UseVisualStyleBackColor = true;
+            renameFileRadio.CheckedChanged += radioButton_CheckedChanged;
             // 
-            // radioButton3
+            // deleteFileRadio
             // 
-            radioButton3.AutoSize = true;
-            radioButton3.Location = new Point(6, 82);
-            radioButton3.Name = "radioButton3";
-            radioButton3.Size = new Size(128, 19);
-            radioButton3.TabIndex = 3;
-            radioButton3.TabStop = true;
-            radioButton3.Text = "Delete file DataBase";
-            radioButton3.UseVisualStyleBackColor = true;
+            deleteFileRadio.AutoSize = true;
+            deleteFileRadio.Location = new Point(6, 82);
+            deleteFileRadio.Name = "deleteFileRadio";
+            deleteFileRadio.Size = new Size(128, 19);
+            deleteFileRadio.TabIndex = 3;
+            deleteFileRadio.TabStop = true;
+            deleteFileRadio.Text = "Delete file DataBase";
+            deleteFileRadio.UseVisualStyleBackColor = true;
+            deleteFileRadio.CheckedChanged += radioButton_CheckedChanged;
             // 
-            // radioButton2
+            // uploadFileRadio
             // 
-            radioButton2.AutoSize = true;
-            radioButton2.Location = new Point(6, 57);
-            radioButton2.Name = "radioButton2";
-            radioButton2.Size = new Size(115, 19);
-            radioButton2.TabIndex = 2;
-            radioButton2.TabStop = true;
-            radioButton2.Text = "Edit file DataBase";
-            radioButton2.UseVisualStyleBackColor = true;
+            uploadFileRadio.AutoSize = true;
+            uploadFileRadio.Location = new Point(6, 57);
+            uploadFileRadio.Name = "uploadFileRadio";
+            uploadFileRadio.Size = new Size(133, 19);
+            uploadFileRadio.TabIndex = 2;
+            uploadFileRadio.TabStop = true;
+            uploadFileRadio.Text = "Upload file DataBase";
+            uploadFileRadio.UseVisualStyleBackColor = true;
+            uploadFileRadio.CheckedChanged += radioButton_CheckedChanged;
             // 
-            // radioButton1
+            // createFileRadio
             // 
-            radioButton1.AutoSize = true;
-            radioButton1.Location = new Point(6, 32);
-            radioButton1.Name = "radioButton1";
-            radioButton1.Size = new Size(163, 19);
-            radioButton1.TabIndex = 1;
-            radioButton1.TabStop = true;
-            radioButton1.Text = "Create a new file DataBase";
-            radioButton1.UseVisualStyleBackColor = true;
+            createFileRadio.AutoSize = true;
+            createFileRadio.Location = new Point(6, 32);
+            createFileRadio.Name = "createFileRadio";
+            createFileRadio.Size = new Size(163, 19);
+            createFileRadio.TabIndex = 1;
+            createFileRadio.TabStop = true;
+            createFileRadio.Text = "Create a new file DataBase";
+            createFileRadio.UseVisualStyleBackColor = true;
+            createFileRadio.CheckedChanged += radioButton_CheckedChanged;
             // 
             // tabControl2
             // 
@@ -230,7 +237,6 @@
             // 
             // button7
             // 
-            button7.Enabled = false;
             button7.FlatStyle = FlatStyle.Flat;
             button7.Location = new Point(6, 151);
             button7.Name = "button7";
@@ -312,7 +318,6 @@
             // 
             // button6
             // 
-            button6.Enabled = false;
             button6.FlatStyle = FlatStyle.Flat;
             button6.Location = new Point(6, 151);
             button6.Name = "button6";
@@ -446,6 +451,7 @@
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "DataBase Assistance";
+            Load += Form1_Load;
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
@@ -476,13 +482,13 @@
         private TabPage tabPage3;
         private TabPage tabPage4;
         private GroupBox groupBox1;
-        private Button button5;
+        private Button acceptButton;
         private Label label1;
         private TextBox textBox1;
-        private RadioButton radioButton4;
-        private RadioButton radioButton3;
-        private RadioButton radioButton2;
-        private RadioButton radioButton1;
+        private RadioButton renameFileRadio;
+        private RadioButton deleteFileRadio;
+        private RadioButton uploadFileRadio;
+        private RadioButton createFileRadio;
         private DataGridView dataGridView2;
         private Label label2;
         private Button button6;
