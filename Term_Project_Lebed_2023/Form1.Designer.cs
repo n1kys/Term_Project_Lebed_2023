@@ -56,10 +56,10 @@
             radioButton6 = new RadioButton();
             radioButton5 = new RadioButton();
             tabPage2 = new TabPage();
-            button4 = new Button();
-            button3 = new Button();
-            button2 = new Button();
-            button1 = new Button();
+            addRow_Button = new Button();
+            deleteRow_Button = new Button();
+            cancelEdit_Button = new Button();
+            save_Button = new Button();
             dataGridView1 = new DataGridView();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
@@ -380,10 +380,10 @@
             // 
             // tabPage2
             // 
-            tabPage2.Controls.Add(button4);
-            tabPage2.Controls.Add(button3);
-            tabPage2.Controls.Add(button2);
-            tabPage2.Controls.Add(button1);
+            tabPage2.Controls.Add(addRow_Button);
+            tabPage2.Controls.Add(deleteRow_Button);
+            tabPage2.Controls.Add(cancelEdit_Button);
+            tabPage2.Controls.Add(save_Button);
             tabPage2.Controls.Add(dataGridView1);
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
@@ -393,45 +393,49 @@
             tabPage2.Text = "Table page";
             tabPage2.UseVisualStyleBackColor = true;
             // 
-            // button4
+            // addRow_Button
             // 
-            button4.FlatStyle = FlatStyle.Flat;
-            button4.Location = new Point(240, 399);
-            button4.Name = "button4";
-            button4.Size = new Size(230, 55);
-            button4.TabIndex = 4;
-            button4.Text = "add row";
-            button4.UseVisualStyleBackColor = true;
+            addRow_Button.FlatStyle = FlatStyle.Flat;
+            addRow_Button.Location = new Point(240, 399);
+            addRow_Button.Name = "addRow_Button";
+            addRow_Button.Size = new Size(230, 55);
+            addRow_Button.TabIndex = 4;
+            addRow_Button.Text = "add row";
+            addRow_Button.UseVisualStyleBackColor = true;
+            addRow_Button.Click += addRow_Button_Click;
             // 
-            // button3
+            // deleteRow_Button
             // 
-            button3.FlatStyle = FlatStyle.Flat;
-            button3.Location = new Point(476, 399);
-            button3.Name = "button3";
-            button3.Size = new Size(203, 55);
-            button3.TabIndex = 3;
-            button3.Text = "delete row";
-            button3.UseVisualStyleBackColor = true;
+            deleteRow_Button.FlatStyle = FlatStyle.Flat;
+            deleteRow_Button.Location = new Point(476, 399);
+            deleteRow_Button.Name = "deleteRow_Button";
+            deleteRow_Button.Size = new Size(203, 55);
+            deleteRow_Button.TabIndex = 3;
+            deleteRow_Button.Text = "delete row";
+            deleteRow_Button.UseVisualStyleBackColor = true;
+            deleteRow_Button.Click += deleteRow_Button_Click;
             // 
-            // button2
+            // cancelEdit_Button
             // 
-            button2.FlatStyle = FlatStyle.Flat;
-            button2.Location = new Point(685, 399);
-            button2.Name = "button2";
-            button2.Size = new Size(201, 55);
-            button2.TabIndex = 2;
-            button2.Text = "Cancel button";
-            button2.UseVisualStyleBackColor = true;
+            cancelEdit_Button.FlatStyle = FlatStyle.Flat;
+            cancelEdit_Button.Location = new Point(685, 399);
+            cancelEdit_Button.Name = "cancelEdit_Button";
+            cancelEdit_Button.Size = new Size(201, 55);
+            cancelEdit_Button.TabIndex = 2;
+            cancelEdit_Button.Text = "Cancel button";
+            cancelEdit_Button.UseVisualStyleBackColor = true;
+            cancelEdit_Button.Click += cancelEdit_Button_Click;
             // 
-            // button1
+            // save_Button
             // 
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(8, 399);
-            button1.Name = "button1";
-            button1.Size = new Size(226, 55);
-            button1.TabIndex = 1;
-            button1.Text = "Save button";
-            button1.UseVisualStyleBackColor = true;
+            save_Button.FlatStyle = FlatStyle.Flat;
+            save_Button.Location = new Point(8, 399);
+            save_Button.Name = "save_Button";
+            save_Button.Size = new Size(226, 55);
+            save_Button.TabIndex = 1;
+            save_Button.Text = "Save button";
+            save_Button.UseVisualStyleBackColor = true;
+            save_Button.Click += save_Button_Click;
             // 
             // dataGridView1
             // 
@@ -474,10 +478,10 @@
         private TabPage tabPage1;
         private TabPage tabPage2;
         private DataGridView dataGridView1;
-        private Button button4;
-        private Button button3;
-        private Button button2;
-        private Button button1;
+        private Button addRow_Button;
+        private Button deleteRow_Button;
+        private Button cancelEdit_Button;
+        private Button save_Button;
         private TabControl tabControl2;
         private TabPage tabPage3;
         private TabPage tabPage4;

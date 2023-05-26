@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using Newtonsoft.Json;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Globalization;
 using System.Data;
 using System.Windows.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
 using OfficeOpenXml;
+using System.Text.RegularExpressions;
 
 namespace Term_Project_Lebed_2023
 {
@@ -41,33 +40,35 @@ namespace Term_Project_Lebed_2023
                     Cell contractAndDateCell = row.Elements<Cell>().ElementAt(1);
                     string contractAndDateValue = GetCellValue(contractAndDateCell, workbookPart);
 
-                    // Удаление ненужных символов
-                    contractAndDateValue = contractAndDateValue.Replace("р.", "").Replace("рік", "").Replace("продовжено", "").Trim();
+                    Cell permitAndDateCell = row.Elements<Cell>().ElementAt(4);
+                    string permitAndDateValue = GetCellValue(permitAndDateCell, workbookPart);
+                    advertisementData.Permit = permitAndDateValue;
 
-                    string[] contractAndDateArray = contractAndDateValue.Split(new string[] { "від" }, StringSplitOptions.RemoveEmptyEntries);
+                    Cell contractt = row.Elements<Cell>().ElementAt(1);
+                    string contracttValue = GetCellValue(contractt, workbookPart);
+                    advertisementData.Contract = contracttValue;
 
-                    if (contractAndDateArray.Length == 2)
+                    // Обработка продолжения договора
+                    string continuationValue;
+                    if (TryExtractContinuation(contractAndDateValue, out continuationValue))
                     {
-                        // Обработка номера договора
-                        string contractNumberValue = contractAndDateArray[0].Trim();
-                        if (contractNumberValue.StartsWith("№"))
-                        {
-                            contractNumberValue = contractNumberValue.Substring(1);
-                        }
-                        int contractNumber;
-                        if (int.TryParse(contractNumberValue, out contractNumber))
-                        {
-                            advertisementData.ContractNumber = contractNumber;
-                        }
-
-                        // Обработка даты договора
-                        string contractDateValue = contractAndDateArray[1].Trim();
-                        DateTime contractDate;
-                        if (DateTime.TryParse(contractDateValue, out contractDate))
-                        {
-                            advertisementData.ContractDate = contractDate;
-                        }
+                        ParseContinuation(continuationValue, advertisementData);
+                        contractAndDateValue = contractAndDateValue.Replace(continuationValue, string.Empty).Trim();
                     }
+
+                    // Обработка номера и даты договора
+                    ParseContract(contractAndDateValue, advertisementData);
+
+                    // Обработка продолжения разрешения
+                    string permitContinuationValue;
+                    if (TryExtractContinuation(permitAndDateValue, out permitContinuationValue))
+                    {
+                        ParseContinuation(permitContinuationValue, advertisementData);
+                        permitAndDateValue = permitAndDateValue.Replace(permitContinuationValue, string.Empty).Trim();
+                    }
+
+                    // Обработка номера и даты разрешения
+                    ParsePermit(permitAndDateValue, advertisementData);
 
                     Cell advertisementTypeCell = row.Elements<Cell>().ElementAt(2);
                     advertisementData.AdvertisementType = GetCellValue(advertisementTypeCell, workbookPart);
@@ -75,42 +76,120 @@ namespace Term_Project_Lebed_2023
                     Cell advertisementInfoCell = row.Elements<Cell>().ElementAt(3);
                     advertisementData.AdvertisementInfo = GetCellValue(advertisementInfoCell, workbookPart);
 
-                    Cell permitAndDateCell = row.Elements<Cell>().ElementAt(4);
-                    string permitAndDateValue = GetCellValue(permitAndDateCell, workbookPart);
-
-                    // Удаление ненужных символов
-                    permitAndDateValue = permitAndDateValue.Replace("р.", "").Replace("рік", "").Replace("продовжено", "").Trim();
-
-                    string[] permitAndDateArray = permitAndDateValue.Split(new string[] { "від" }, StringSplitOptions.RemoveEmptyEntries);
-
-                    if (permitAndDateArray.Length == 2)
-                    {
-                        // Обработка номера разрешения
-                        string permitNumberValue = permitAndDateArray[0].Trim();
-                        if (permitNumberValue.StartsWith("№"))
-                        {
-                            permitNumberValue = permitNumberValue.Substring(1);
-                        }
-                        int permitNumber;
-                        if (int.TryParse(permitNumberValue, out permitNumber))
-                        {
-                            advertisementData.PermitNumber = permitNumber;
-                        }
-
-                        // Обработка даты разрешения
-                        string permitDateValue = permitAndDateArray[1].Trim();
-                        DateTime permitDate;
-                        if (DateTime.TryParse(permitDateValue, out permitDate))
-                        {
-                            advertisementData.PermitDate = permitDate;
-                        }
-                    }
-
                     advertisementDataList.Add(advertisementData);
                 }
             }
 
             return advertisementDataList;
+        }
+
+        private bool TryExtractContinuation(string value, out string continuationValue)
+        {
+            continuationValue = string.Empty;
+
+            string pattern = @"Продовжено\s*(.+)";
+            Match match = Regex.Match(value, pattern);
+            if (match.Success)
+            {
+                continuationValue = match.Groups[1].Value.Trim();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ParseContract(string contractValue, AdvertisementData advertisementData)
+        {
+            string pattern = @"(.+)\s+від\s+(.+)";
+            Match match = Regex.Match(contractValue, pattern);
+            if (match.Success)
+            {
+                string contractNumberValue = match.Groups[1].Value.Trim();
+                advertisementData.ContractNumberValue = contractNumberValue;
+
+                string contractNumberPattern = @"(\d+)(?:\-(\d+))?(?:\/(\d+))?";
+                Match contractNumberMatch = Regex.Match(contractNumberValue, contractNumberPattern);
+                if (contractNumberMatch.Success)
+                {
+                    if (int.TryParse(contractNumberMatch.Groups[1].Value.Trim(), out int contractNumber))
+                    {
+                        advertisementData.ContractNumber = contractNumber;
+                    }
+
+                    string subContractNumberValue = contractNumberMatch.Groups[2].Value.Trim();
+                    if (!string.IsNullOrEmpty(subContractNumberValue) && int.TryParse(subContractNumberValue, out int subContractNumber))
+                    {
+                        advertisementData.ContractNumber = subContractNumber;
+                    }
+
+                    string yearValue = contractNumberMatch.Groups[3].Value.Trim();
+                    if (!string.IsNullOrEmpty(yearValue) && int.TryParse(yearValue, out int year))
+                    {
+                        advertisementData.ContractDate = new DateTime(year, 1, 1);
+                    }
+                }
+
+                string contractDateValue = match.Groups[2].Value.Trim();
+                DateTime contractDate;
+                if (DateTime.TryParse(contractDateValue, out contractDate))
+                {
+                    advertisementData.ContractDate = contractDate;
+                }
+            }
+        }
+
+        private void ParseContinuation(string continuationValue, AdvertisementData advertisementData)
+        {
+            string continuationNumberValue = "";
+            string continuationDateValue = "";
+
+            string pattern = @"(.+)\s+рік(?:\.|\s+)(.+)";
+            Match match = Regex.Match(continuationValue, pattern);
+            if (match.Success)
+            {
+                continuationNumberValue = match.Groups[2].Value.Trim();
+                continuationDateValue = match.Groups[1].Value.Trim();
+            }
+
+            if (!string.IsNullOrEmpty(continuationNumberValue))
+            {
+                if (int.TryParse(continuationNumberValue, out int continuationNumber))
+                {
+                    advertisementData.ContinuationNumber = continuationNumber;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(continuationDateValue))
+            {
+                DateTime continuationDate;
+                if (DateTime.TryParse(continuationDateValue, out continuationDate))
+                {
+                    advertisementData.ContinuationDate = continuationDate;
+                }
+            }
+        }
+
+
+
+
+        private void ParsePermit(string permitValue, AdvertisementData advertisementData)
+        {
+            string[] permitArray = permitValue.Split(new string[] { "від" }, StringSplitOptions.RemoveEmptyEntries);
+            if (permitArray.Length == 2)
+            {
+                string permitNumberValue = permitArray[0].Trim();
+                advertisementData.PermitNumberValue = permitNumberValue;
+                if (int.TryParse(permitNumberValue, out int permitNumber))
+                {
+                    advertisementData.PermitNumber = permitNumber;
+                }
+
+                string permitDateValue = permitArray[1].Trim();
+                if (DateTime.TryParse(permitDateValue, out DateTime permitDate))
+                {
+                    advertisementData.PermitDate = permitDate;
+                }
+            }
         }
 
         public void addInfoToEmptyFile(ref DataGridView dgv)
@@ -125,6 +204,7 @@ namespace Term_Project_Lebed_2023
             dgv.Columns.Add("Column3", "Тип зовнішньої реклами");
             dgv.Columns.Add("Column4", "Інформація про рекламні засоби (адреса розміщення реклами)");
             dgv.Columns.Add("Column5", "№ дозволу, дата");
+            dgv.Columns.Add("Column6", "Статус");
         }
 
         public void addInfoToDataGrid(ref DataGridView dgv)
@@ -140,6 +220,7 @@ namespace Term_Project_Lebed_2023
             dataTable.Columns.Add("Тип зовнішньої реклами");
             dataTable.Columns.Add("Інформація про рекламні засоби (адреса розміщення реклами)");
             dataTable.Columns.Add("№ дозволу, дата");
+            dataTable.Columns.Add("Статус");
 
             // Заполняем таблицу данными из списка advertisementDataList
             for (int i = 1; i < advertisementDataList.Count; i++)
@@ -151,10 +232,26 @@ namespace Term_Project_Lebed_2023
 
                 DataRow row = dataTable.NewRow();
                 row["Назва субєкта господарювання"] = advertisementData.SubjectName;
-                row["№ договору, дата"] = advertisementData.ContractNumber + " " + advertisementData.ContractDate;
+                row["№ договору, дата"] = advertisementData.Contract;
                 row["Тип зовнішньої реклами"] = advertisementData.AdvertisementType;
                 row["Інформація про рекламні засоби (адреса розміщення реклами)"] = advertisementData.AdvertisementInfo;
-                row["№ дозволу, дата"] = advertisementData.PermitNumber + " " + advertisementData.PermitDate;
+                row["№ дозволу, дата"] = advertisementData.Permit;
+
+                // Определяем значение статуса в зависимости от наличия продления
+                if (advertisementData.ContinuationDate != DateTime.MinValue || 
+                        advertisementData.Contract.Contains("Продовжено") || 
+                        advertisementData.Contract.Contains("продовжено") || 
+                        advertisementData.Contract.Contains(",") || 
+                        advertisementData.Contract.Contains(";"))
+                {
+                    string statusValue = "продовжено ";
+                    row["Статус"] = statusValue;
+                }
+                else
+                {
+                    row["Статус"] = "дійсний";
+                }
+
                 dataTable.Rows.Add(row);
             }
 
@@ -162,15 +259,15 @@ namespace Term_Project_Lebed_2023
             dgv.DataSource = dataTable;
 
             // Устанавливаем заголовки столбцов
-            dgv.Columns[0].HeaderText = "Назва субєкта господарювання";
+            dgv.Columns[0].HeaderText = "Назва суб'єкта господарювання";
             dgv.Columns[1].HeaderText = "№ договору, дата";
             dgv.Columns[2].HeaderText = "Тип зовнішньої реклами";
             dgv.Columns[3].HeaderText = "Інформація про рекламні засоби (адреса розміщення реклами)";
             dgv.Columns[4].HeaderText = "№ дозволу, дата";
+            dgv.Columns[5].HeaderText = "Статус";
 
             // Выравниваем данные в столбце "Інформація про рекламні засоби (адреса розміщення реклами)"
             dgv.Columns[3].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-            
         }
 
         public void createExcelFile(string filePath)
@@ -198,53 +295,38 @@ namespace Term_Project_Lebed_2023
             return cellValue;
         }
 
-        private void ExtractContractAndPermitNumbers(string text, out int contractNumber, out int permitNumber)
+        public void SerializeToExcel(List<AdvertisementData> advertisementDataList, string excelFilePath)
         {
-            string[] parts = text.Split(' ');
-            contractNumber = 0;
-            permitNumber = 0;
-
-            foreach (string part in parts)
+            // Создание нового документа Excel
+            using (ExcelPackage package = new ExcelPackage())
             {
-                if (part.StartsWith("№"))
+                // Добавление листа в документ
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("AdvertisementData");
+
+                // Запись заголовков столбцов
+                worksheet.Cells[1, 1].Value = "Назва суб'єкта господарювання";
+                worksheet.Cells[1, 2].Value = "№ договору, дата";
+                worksheet.Cells[1, 3].Value = "Тип зовнішньої реклами";
+                worksheet.Cells[1, 4].Value = "Інформація про рекламні засоби (адреса розміщення реклами)";
+                worksheet.Cells[1, 5].Value = "№ дозволу, дата";
+
+                // Запись данных в ячейки
+                for (int i = 0; i < advertisementDataList.Count; i++)
                 {
-                    string numberText = part.Substring(1);
-                    if (int.TryParse(numberText, out int number))
-                    {
-                        if (contractNumber == 0)
-                            contractNumber = number;
-                        else
-                            permitNumber = number;
-                    }
+                    AdvertisementData advertisementData = advertisementDataList[i];
+                    int row = i + 2;
+
+                    worksheet.Cells[row, 1].Value = advertisementData.SubjectName;
+                    worksheet.Cells[row, 2].Value = advertisementData.Contract;
+                    worksheet.Cells[row, 3].Value = advertisementData.AdvertisementType;
+                    worksheet.Cells[row, 4].Value = advertisementData.AdvertisementInfo;
+                    worksheet.Cells[row, 5].Value = advertisementData.Permit;
                 }
+
+                // Сохранение документа в файл
+                package.SaveAs(new FileInfo(excelFilePath));
             }
         }
 
-        private DateTime ParseDate(string text)
-        {
-            DateTime date = DateTime.MinValue;
-
-            // Check if the text contains "від"
-            if (text.Contains("від"))
-            {
-                // Remove any unnecessary characters and trim the text
-                string cleanedText = text.Replace("від", "").Trim();
-
-                // Split the cleaned text into day, month, and year parts
-                string[] dateParts = cleanedText.Split('.');
-
-                if (dateParts.Length == 3)
-                {
-                    int day = int.Parse(dateParts[0]);
-                    int month = int.Parse(dateParts[1]);
-                    int year = int.Parse(dateParts[2]);
-
-                    // Assuming the date format is DD.MM.YYYY
-                    date = new DateTime(year, month, day);
-                }
-            }
-
-            return date;
-        }
     }
 }
