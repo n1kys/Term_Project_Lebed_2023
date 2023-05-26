@@ -11,8 +11,6 @@ namespace Term_Project_Lebed_2023
         public Form1()
         {
             InitializeComponent();
-
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -31,6 +29,30 @@ namespace Term_Project_Lebed_2023
                 textBox1.Enabled = true;
             }
             if (renameFileRadio.Checked) { label1.Text = "Enter new file's name"; textBox1.Enabled = true; }
+        }
+
+        private void enableSearch_button(object sender, EventArgs e)
+        {
+            searchTextBox.Enabled = false;
+            searchTextBox.Text = string.Empty;
+            if (searchBySubject_rButton.Checked || searchByContract_rButton.Checked
+                || searchByType_rButton.Checked || searchByInfo_rButton.Checked || searchByPermit_rButton.Checked)
+            {
+                searchTextBox.Enabled = true;
+            }
+
+        }
+
+        private void searchTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(searchTextBox.Text))
+            {
+                searchByParam_button.Enabled = true;
+            }
+            else
+            {
+                searchByParam_button.Enabled = false;
+            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -300,5 +322,38 @@ namespace Term_Project_Lebed_2023
                 MessageBox.Show("Нет сохраненных исходных данных.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void searchByParam_button_Click(object sender, EventArgs e)
+        {
+            WorkWithAdvertismentData data = new WorkWithAdvertismentData();
+            string searchText = searchTextBox.Text; // Заданный текст для поиска
+            DataTable dataTable2 = new DataTable(); // Создаем новый объект DataTable
+
+            if (searchBySubject_rButton.Checked)
+            {
+                data.searchBySubject(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
+            }
+            if(searchByContract_rButton.Checked)
+            {
+                data.searchByContract(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
+            }
+            if(searchByType_rButton.Checked)
+            {
+                data.searchByType(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
+            }
+            if (searchByInfo_rButton.Checked)
+            {
+                data.searchByInfo(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);    
+            }
+            if(searchByPermit_rButton.Checked)
+            {
+                data.searchByPermit(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
+            }
+        }
+
+
+
+
+
     }
 }

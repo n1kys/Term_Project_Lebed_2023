@@ -42,12 +42,14 @@
             createFileRadio = new RadioButton();
             tabControl2 = new TabControl();
             tabPage3 = new TabPage();
-            button7 = new Button();
-            radioButton14 = new RadioButton();
-            radioButton13 = new RadioButton();
-            radioButton12 = new RadioButton();
-            radioButton11 = new RadioButton();
-            radioButton10 = new RadioButton();
+            searchTextBox = new TextBox();
+            label3 = new Label();
+            searchByParam_button = new Button();
+            searchByInfo_rButton = new RadioButton();
+            searchByPermit_rButton = new RadioButton();
+            searchByType_rButton = new RadioButton();
+            searchByContract_rButton = new RadioButton();
+            searchBySubject_rButton = new RadioButton();
             tabPage4 = new TabPage();
             button6 = new Button();
             radioButton9 = new RadioButton();
@@ -216,89 +218,116 @@
             tabControl2.Location = new Point(411, 6);
             tabControl2.Name = "tabControl2";
             tabControl2.SelectedIndex = 0;
-            tabControl2.Size = new Size(475, 220);
+            tabControl2.Size = new Size(475, 244);
             tabControl2.TabIndex = 0;
             // 
             // tabPage3
             // 
-            tabPage3.Controls.Add(button7);
-            tabPage3.Controls.Add(radioButton14);
-            tabPage3.Controls.Add(radioButton13);
-            tabPage3.Controls.Add(radioButton12);
-            tabPage3.Controls.Add(radioButton11);
-            tabPage3.Controls.Add(radioButton10);
+            tabPage3.Controls.Add(searchTextBox);
+            tabPage3.Controls.Add(label3);
+            tabPage3.Controls.Add(searchByParam_button);
+            tabPage3.Controls.Add(searchByInfo_rButton);
+            tabPage3.Controls.Add(searchByPermit_rButton);
+            tabPage3.Controls.Add(searchByType_rButton);
+            tabPage3.Controls.Add(searchByContract_rButton);
+            tabPage3.Controls.Add(searchBySubject_rButton);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
             tabPage3.Padding = new Padding(3);
-            tabPage3.Size = new Size(467, 192);
+            tabPage3.Size = new Size(467, 216);
             tabPage3.TabIndex = 0;
             tabPage3.Text = "Search page";
             tabPage3.UseVisualStyleBackColor = true;
             // 
-            // button7
+            // searchTextBox
             // 
-            button7.FlatStyle = FlatStyle.Flat;
-            button7.Location = new Point(6, 151);
-            button7.Name = "button7";
-            button7.Size = new Size(455, 35);
-            button7.TabIndex = 5;
-            button7.Text = "Search";
-            button7.UseVisualStyleBackColor = true;
+            searchTextBox.Enabled = false;
+            searchTextBox.Location = new Point(18, 172);
+            searchTextBox.Name = "searchTextBox";
+            searchTextBox.Size = new Size(192, 23);
+            searchTextBox.TabIndex = 7;
+            searchTextBox.TextChanged += searchTextBox_TextChanged;
             // 
-            // radioButton14
+            // label3
             // 
-            radioButton14.AutoSize = true;
-            radioButton14.Location = new Point(18, 121);
-            radioButton14.Name = "radioButton14";
-            radioButton14.Size = new Size(150, 19);
-            radioButton14.TabIndex = 4;
-            radioButton14.TabStop = true;
-            radioButton14.Text = "Search by info about ad";
-            radioButton14.UseVisualStyleBackColor = true;
+            label3.AutoSize = true;
+            label3.Location = new Point(18, 152);
+            label3.Name = "label3";
+            label3.Size = new Size(190, 15);
+            label3.TabIndex = 6;
+            label3.Text = "Enter text, that you want to search:";
             // 
-            // radioButton13
+            // searchByParam_button
             // 
-            radioButton13.AutoSize = true;
-            radioButton13.Location = new Point(18, 96);
-            radioButton13.Name = "radioButton13";
-            radioButton13.Size = new Size(143, 19);
-            radioButton13.TabIndex = 3;
-            radioButton13.TabStop = true;
-            radioButton13.Text = "Search by permit, date";
-            radioButton13.UseVisualStyleBackColor = true;
+            searchByParam_button.Enabled = false;
+            searchByParam_button.FlatStyle = FlatStyle.Flat;
+            searchByParam_button.Location = new Point(228, 172);
+            searchByParam_button.Name = "searchByParam_button";
+            searchByParam_button.Size = new Size(223, 23);
+            searchByParam_button.TabIndex = 5;
+            searchByParam_button.Text = "Search";
+            searchByParam_button.UseVisualStyleBackColor = true;
+            searchByParam_button.Click += searchByParam_button_Click;
             // 
-            // radioButton12
+            // searchByInfo_rButton
             // 
-            radioButton12.AutoSize = true;
-            radioButton12.Location = new Point(18, 71);
-            radioButton12.Name = "radioButton12";
-            radioButton12.Size = new Size(126, 19);
-            radioButton12.TabIndex = 2;
-            radioButton12.TabStop = true;
-            radioButton12.Text = "Search by ad's type";
-            radioButton12.UseVisualStyleBackColor = true;
+            searchByInfo_rButton.AutoSize = true;
+            searchByInfo_rButton.Location = new Point(18, 121);
+            searchByInfo_rButton.Name = "searchByInfo_rButton";
+            searchByInfo_rButton.Size = new Size(150, 19);
+            searchByInfo_rButton.TabIndex = 4;
+            searchByInfo_rButton.TabStop = true;
+            searchByInfo_rButton.Text = "Search by info about ad";
+            searchByInfo_rButton.UseVisualStyleBackColor = true;
+            searchByInfo_rButton.CheckedChanged += enableSearch_button;
             // 
-            // radioButton11
+            // searchByPermit_rButton
             // 
-            radioButton11.AutoSize = true;
-            radioButton11.Location = new Point(18, 46);
-            radioButton11.Name = "radioButton11";
-            radioButton11.Size = new Size(205, 19);
-            radioButton11.TabIndex = 1;
-            radioButton11.TabStop = true;
-            radioButton11.Text = "Search by contract's number, date";
-            radioButton11.UseVisualStyleBackColor = true;
+            searchByPermit_rButton.AutoSize = true;
+            searchByPermit_rButton.Location = new Point(18, 96);
+            searchByPermit_rButton.Name = "searchByPermit_rButton";
+            searchByPermit_rButton.Size = new Size(143, 19);
+            searchByPermit_rButton.TabIndex = 3;
+            searchByPermit_rButton.TabStop = true;
+            searchByPermit_rButton.Text = "Search by permit, date";
+            searchByPermit_rButton.UseVisualStyleBackColor = true;
+            searchByPermit_rButton.CheckedChanged += enableSearch_button;
             // 
-            // radioButton10
+            // searchByType_rButton
             // 
-            radioButton10.AutoSize = true;
-            radioButton10.Location = new Point(18, 21);
-            radioButton10.Name = "radioButton10";
-            radioButton10.Size = new Size(164, 19);
-            radioButton10.TabIndex = 0;
-            radioButton10.TabStop = true;
-            radioButton10.Text = "Search by name of subject";
-            radioButton10.UseVisualStyleBackColor = true;
+            searchByType_rButton.AutoSize = true;
+            searchByType_rButton.Location = new Point(18, 71);
+            searchByType_rButton.Name = "searchByType_rButton";
+            searchByType_rButton.Size = new Size(126, 19);
+            searchByType_rButton.TabIndex = 2;
+            searchByType_rButton.TabStop = true;
+            searchByType_rButton.Text = "Search by ad's type";
+            searchByType_rButton.UseVisualStyleBackColor = true;
+            searchByType_rButton.CheckedChanged += enableSearch_button;
+            // 
+            // searchByContract_rButton
+            // 
+            searchByContract_rButton.AutoSize = true;
+            searchByContract_rButton.Location = new Point(18, 46);
+            searchByContract_rButton.Name = "searchByContract_rButton";
+            searchByContract_rButton.Size = new Size(205, 19);
+            searchByContract_rButton.TabIndex = 1;
+            searchByContract_rButton.TabStop = true;
+            searchByContract_rButton.Text = "Search by contract's number, date";
+            searchByContract_rButton.UseVisualStyleBackColor = true;
+            searchByContract_rButton.CheckedChanged += enableSearch_button;
+            // 
+            // searchBySubject_rButton
+            // 
+            searchBySubject_rButton.AutoSize = true;
+            searchBySubject_rButton.Location = new Point(18, 21);
+            searchBySubject_rButton.Name = "searchBySubject_rButton";
+            searchBySubject_rButton.Size = new Size(164, 19);
+            searchBySubject_rButton.TabIndex = 0;
+            searchBySubject_rButton.TabStop = true;
+            searchBySubject_rButton.Text = "Search by name of subject";
+            searchBySubject_rButton.UseVisualStyleBackColor = true;
+            searchBySubject_rButton.CheckedChanged += enableSearch_button;
             // 
             // tabPage4
             // 
@@ -311,7 +340,7 @@
             tabPage4.Location = new Point(4, 24);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(3);
-            tabPage4.Size = new Size(467, 192);
+            tabPage4.Size = new Size(467, 216);
             tabPage4.TabIndex = 1;
             tabPage4.Text = "Sort page";
             tabPage4.UseVisualStyleBackColor = true;
@@ -369,12 +398,10 @@
             // radioButton5
             // 
             radioButton5.AutoSize = true;
-            radioButton5.Checked = true;
             radioButton5.Location = new Point(18, 21);
             radioButton5.Name = "radioButton5";
             radioButton5.Size = new Size(150, 19);
             radioButton5.TabIndex = 0;
-            radioButton5.TabStop = true;
             radioButton5.Text = "Sort by name of subject";
             radioButton5.UseVisualStyleBackColor = true;
             // 
@@ -501,11 +528,13 @@
         private RadioButton radioButton7;
         private RadioButton radioButton6;
         private RadioButton radioButton5;
-        private Button button7;
-        private RadioButton radioButton14;
-        private RadioButton radioButton13;
-        private RadioButton radioButton12;
-        private RadioButton radioButton11;
-        private RadioButton radioButton10;
+        private Button searchByParam_button;
+        private RadioButton searchByInfo_rButton;
+        private RadioButton searchByPermit_rButton;
+        private RadioButton searchByType_rButton;
+        private RadioButton searchByContract_rButton;
+        private RadioButton searchBySubject_rButton;
+        private TextBox searchTextBox;
+        private Label label3;
     }
 }

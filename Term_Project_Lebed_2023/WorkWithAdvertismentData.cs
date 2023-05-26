@@ -169,9 +169,6 @@ namespace Term_Project_Lebed_2023
             }
         }
 
-
-
-
         private void ParsePermit(string permitValue, AdvertisementData advertisementData)
         {
             string[] permitArray = permitValue.Split(new string[] { "від" }, StringSplitOptions.RemoveEmptyEntries);
@@ -205,6 +202,18 @@ namespace Term_Project_Lebed_2023
             dgv.Columns.Add("Column4", "Інформація про рекламні засоби (адреса розміщення реклами)");
             dgv.Columns.Add("Column5", "№ дозволу, дата");
             dgv.Columns.Add("Column6", "Статус");
+        }
+
+        private string GetCellValue(Cell cell, WorkbookPart workbookPart)
+        {
+            string cellValue = cell.InnerText;
+            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
+            {
+                SharedStringTablePart stringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().First();
+                cellValue = stringTablePart.SharedStringTable.ChildElements[int.Parse(cellValue)].InnerText;
+            }
+
+            return cellValue;
         }
 
         public void addInfoToDataGrid(ref DataGridView dgv)
@@ -281,20 +290,6 @@ namespace Term_Project_Lebed_2023
             MessageBox.Show("Excel-файл успешно создан.");
         }
 
-
-
-        private string GetCellValue(Cell cell, WorkbookPart workbookPart)
-        {
-            string cellValue = cell.InnerText;
-            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
-            {
-                SharedStringTablePart stringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().First();
-                cellValue = stringTablePart.SharedStringTable.ChildElements[int.Parse(cellValue)].InnerText;
-            }
-
-            return cellValue;
-        }
-
         public void SerializeToExcel(List<AdvertisementData> advertisementDataList, string excelFilePath)
         {
             // Создание нового документа Excel
@@ -328,5 +323,172 @@ namespace Term_Project_Lebed_2023
             }
         }
 
+        public void searchBySubject(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2, string searchText)
+        {
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                dataTable2.Columns.Add(column.Name, column.ValueType);
+            }
+
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells["Назва субєкта господарювання"].Value != null && row.Cells["Назва субєкта господарювання"].Value.ToString().Contains(searchText))
+                {
+                    DataRow newRow = dataTable2.NewRow();
+                    // Копируем данные из найденной строки в новую строку таблицы dataTable2
+                    for (int i = 0; i < dgv1.Columns.Count; i++)
+                    {
+                        newRow[i] = row.Cells[dgv1.Columns[i].Name].Value;
+                    }
+                    dataTable2.Rows.Add(newRow); // Добавляем новую строку в dataTable2
+                }
+            }
+
+            if (dataTable2.Rows.Count > 0)
+            {
+                dgv2.AutoGenerateColumns = true; // Включаем автоматическую генерацию столбцов
+                dgv2.DataSource = dataTable2; // Устанавливаем источник данных для dataGridView2
+            }
+            else
+            {
+                dgv2.Columns.Clear();
+                MessageBox.Show("Совпадения в свойстве 'Назва суб'єкта господарювання' не найдены.");
+            }
+        }
+
+        public void searchByContract(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2, string searchText)
+        {
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                dataTable2.Columns.Add(column.Name, column.ValueType);
+            }
+
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells["№ договору, дата"].Value != null && row.Cells["№ договору, дата"].Value.ToString().Contains(searchText))
+                {
+                    DataRow newRow = dataTable2.NewRow();
+                    // Копируем данные из найденной строки в новую строку таблицы dataTable2
+                    for (int i = 0; i < dgv1.Columns.Count; i++)
+                    {
+                        newRow[i] = row.Cells[dgv1.Columns[i].Name].Value;
+                    }
+                    dataTable2.Rows.Add(newRow); // Добавляем новую строку в dataTable2
+                }
+            }
+
+            if (dataTable2.Rows.Count > 0)
+            {
+                dgv2.AutoGenerateColumns = true; // Включаем автоматическую генерацию столбцов
+                dgv2.DataSource = dataTable2; // Устанавливаем источник данных для dataGridView2
+            }
+            else
+            {
+                dgv2.Columns.Clear();
+                MessageBox.Show("Совпадения в свойстве '№ договору, дата' не найдены.");
+            }
+        }
+
+        public void searchByType(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2, string searchText)
+        {
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                dataTable2.Columns.Add(column.Name, column.ValueType);
+            }
+
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells["Тип зовнішньої реклами"].Value != null && row.Cells["Тип зовнішньої реклами"].Value.ToString().Contains(searchText))
+                {
+                    DataRow newRow = dataTable2.NewRow();
+                    // Копируем данные из найденной строки в новую строку таблицы dataTable2
+                    for (int i = 0; i < dgv1.Columns.Count; i++)
+                    {
+                        newRow[i] = row.Cells[dgv1.Columns[i].Name].Value;
+                    }
+                    dataTable2.Rows.Add(newRow); // Добавляем новую строку в dataTable2
+                }
+            }
+
+            if (dataTable2.Rows.Count > 0)
+            {
+                dgv2.AutoGenerateColumns = true; // Включаем автоматическую генерацию столбцов
+                dgv2.DataSource = dataTable2; // Устанавливаем источник данных для dataGridView2
+            }
+            else
+            {
+                dgv2.Columns.Clear();
+                MessageBox.Show("Совпадения в свойстве 'Тип зовнішньої реклами' не найдены.");
+            }
+        }
+
+        public void searchByInfo(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2, string searchText)
+        {
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                dataTable2.Columns.Add(column.Name, column.ValueType);
+            }
+
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells["Інформація про рекламні засоби (адреса розміщення реклами)"].Value != null 
+                    && row.Cells["Інформація про рекламні засоби (адреса розміщення реклами)"].Value.ToString().Contains(searchText))
+                {
+                    DataRow newRow = dataTable2.NewRow();
+                    // Копируем данные из найденной строки в новую строку таблицы dataTable2
+                    for (int i = 0; i < dgv1.Columns.Count; i++)
+                    {
+                        newRow[i] = row.Cells[dgv1.Columns[i].Name].Value;
+                    }
+                    dataTable2.Rows.Add(newRow); // Добавляем новую строку в dataTable2
+                }
+            }
+
+            if (dataTable2.Rows.Count > 0)
+            {
+                dgv2.AutoGenerateColumns = true; // Включаем автоматическую генерацию столбцов
+                dgv2.DataSource = dataTable2; // Устанавливаем источник данных для dataGridView2
+            }
+            else
+            {
+                dgv2.Columns.Clear();
+                MessageBox.Show("Совпадения в свойстве 'Інформація про рекламні засоби (адреса розміщення реклами)' не найдены.");
+            }
+        }
+
+        public void searchByPermit(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2, string searchText)
+        {
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                dataTable2.Columns.Add(column.Name, column.ValueType);
+            }
+
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells["№ дозволу, дата"].Value != null
+                    && row.Cells["№ дозволу, дата"].Value.ToString().Contains(searchText))
+                {
+                    DataRow newRow = dataTable2.NewRow();
+                    // Копируем данные из найденной строки в новую строку таблицы dataTable2
+                    for (int i = 0; i < dgv1.Columns.Count; i++)
+                    {
+                        newRow[i] = row.Cells[dgv1.Columns[i].Name].Value;
+                    }
+                    dataTable2.Rows.Add(newRow); // Добавляем новую строку в dataTable2
+                }
+            }
+
+            if (dataTable2.Rows.Count > 0)
+            {
+                dgv2.AutoGenerateColumns = true; // Включаем автоматическую генерацию столбцов
+                dgv2.DataSource = dataTable2; // Устанавливаем источник данных для dataGridView2
+            }
+            else
+            {
+                dgv2.Columns.Clear();
+                MessageBox.Show("Совпадения в свойстве '№ дозволу, дата' не найдены.");
+            }
+        }
     }
+
 }
