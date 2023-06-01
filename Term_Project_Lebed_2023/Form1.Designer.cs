@@ -51,12 +51,12 @@
             searchByContract_rButton = new RadioButton();
             searchBySubject_rButton = new RadioButton();
             tabPage4 = new TabPage();
-            button6 = new Button();
-            radioButton9 = new RadioButton();
-            radioButton8 = new RadioButton();
-            radioButton7 = new RadioButton();
-            radioButton6 = new RadioButton();
-            radioButton5 = new RadioButton();
+            sortButton = new Button();
+            sortByInfo_rButton = new RadioButton();
+            sortByPermit_rButton = new RadioButton();
+            sortByType_rButton = new RadioButton();
+            SortByContract_rButton = new RadioButton();
+            sortByName_rButton = new RadioButton();
             tabPage2 = new TabPage();
             addRow_Button = new Button();
             deleteRow_Button = new Button();
@@ -331,12 +331,12 @@
             // 
             // tabPage4
             // 
-            tabPage4.Controls.Add(button6);
-            tabPage4.Controls.Add(radioButton9);
-            tabPage4.Controls.Add(radioButton8);
-            tabPage4.Controls.Add(radioButton7);
-            tabPage4.Controls.Add(radioButton6);
-            tabPage4.Controls.Add(radioButton5);
+            tabPage4.Controls.Add(sortButton);
+            tabPage4.Controls.Add(sortByInfo_rButton);
+            tabPage4.Controls.Add(sortByPermit_rButton);
+            tabPage4.Controls.Add(sortByType_rButton);
+            tabPage4.Controls.Add(SortByContract_rButton);
+            tabPage4.Controls.Add(sortByName_rButton);
             tabPage4.Location = new Point(4, 24);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(3);
@@ -345,65 +345,72 @@
             tabPage4.Text = "Sort page";
             tabPage4.UseVisualStyleBackColor = true;
             // 
-            // button6
+            // sortButton
             // 
-            button6.FlatStyle = FlatStyle.Flat;
-            button6.Location = new Point(6, 151);
-            button6.Name = "button6";
-            button6.Size = new Size(455, 35);
-            button6.TabIndex = 5;
-            button6.Text = "Sort";
-            button6.UseVisualStyleBackColor = true;
+            sortButton.Enabled = false;
+            sortButton.FlatStyle = FlatStyle.Flat;
+            sortButton.Location = new Point(6, 164);
+            sortButton.Name = "sortButton";
+            sortButton.Size = new Size(455, 35);
+            sortButton.TabIndex = 5;
+            sortButton.Text = "Sort";
+            sortButton.UseVisualStyleBackColor = true;
+            sortButton.Click += sortButton_Click;
             // 
-            // radioButton9
+            // sortByInfo_rButton
             // 
-            radioButton9.AutoSize = true;
-            radioButton9.Location = new Point(18, 121);
-            radioButton9.Name = "radioButton9";
-            radioButton9.Size = new Size(136, 19);
-            radioButton9.TabIndex = 4;
-            radioButton9.Text = "Sort by info about ad";
-            radioButton9.UseVisualStyleBackColor = true;
+            sortByInfo_rButton.AutoSize = true;
+            sortByInfo_rButton.Location = new Point(18, 121);
+            sortByInfo_rButton.Name = "sortByInfo_rButton";
+            sortByInfo_rButton.Size = new Size(136, 19);
+            sortByInfo_rButton.TabIndex = 4;
+            sortByInfo_rButton.Text = "Sort by info about ad";
+            sortByInfo_rButton.UseVisualStyleBackColor = true;
+            sortByInfo_rButton.CheckedChanged += sort_CheckedChanged;
             // 
-            // radioButton8
+            // sortByPermit_rButton
             // 
-            radioButton8.AutoSize = true;
-            radioButton8.Location = new Point(18, 96);
-            radioButton8.Name = "radioButton8";
-            radioButton8.Size = new Size(129, 19);
-            radioButton8.TabIndex = 3;
-            radioButton8.Text = "Sort by permit, date";
-            radioButton8.UseVisualStyleBackColor = true;
+            sortByPermit_rButton.AutoSize = true;
+            sortByPermit_rButton.Location = new Point(18, 96);
+            sortByPermit_rButton.Name = "sortByPermit_rButton";
+            sortByPermit_rButton.Size = new Size(129, 19);
+            sortByPermit_rButton.TabIndex = 3;
+            sortByPermit_rButton.Text = "Sort by permit, date";
+            sortByPermit_rButton.UseVisualStyleBackColor = true;
+            sortByPermit_rButton.CheckedChanged += sort_CheckedChanged;
             // 
-            // radioButton7
+            // sortByType_rButton
             // 
-            radioButton7.AutoSize = true;
-            radioButton7.Location = new Point(18, 71);
-            radioButton7.Name = "radioButton7";
-            radioButton7.Size = new Size(112, 19);
-            radioButton7.TabIndex = 2;
-            radioButton7.Text = "Sort by ad's type";
-            radioButton7.UseVisualStyleBackColor = true;
+            sortByType_rButton.AutoSize = true;
+            sortByType_rButton.Location = new Point(18, 71);
+            sortByType_rButton.Name = "sortByType_rButton";
+            sortByType_rButton.Size = new Size(112, 19);
+            sortByType_rButton.TabIndex = 2;
+            sortByType_rButton.Text = "Sort by ad's type";
+            sortByType_rButton.UseVisualStyleBackColor = true;
+            sortByType_rButton.CheckedChanged += sort_CheckedChanged;
             // 
-            // radioButton6
+            // SortByContract_rButton
             // 
-            radioButton6.AutoSize = true;
-            radioButton6.Location = new Point(18, 46);
-            radioButton6.Name = "radioButton6";
-            radioButton6.Size = new Size(191, 19);
-            radioButton6.TabIndex = 1;
-            radioButton6.Text = "Sort by contract's number, date";
-            radioButton6.UseVisualStyleBackColor = true;
+            SortByContract_rButton.AutoSize = true;
+            SortByContract_rButton.Location = new Point(18, 46);
+            SortByContract_rButton.Name = "SortByContract_rButton";
+            SortByContract_rButton.Size = new Size(191, 19);
+            SortByContract_rButton.TabIndex = 1;
+            SortByContract_rButton.Text = "Sort by contract's number, date";
+            SortByContract_rButton.UseVisualStyleBackColor = true;
+            SortByContract_rButton.CheckedChanged += sort_CheckedChanged;
             // 
-            // radioButton5
+            // sortByName_rButton
             // 
-            radioButton5.AutoSize = true;
-            radioButton5.Location = new Point(18, 21);
-            radioButton5.Name = "radioButton5";
-            radioButton5.Size = new Size(150, 19);
-            radioButton5.TabIndex = 0;
-            radioButton5.Text = "Sort by name of subject";
-            radioButton5.UseVisualStyleBackColor = true;
+            sortByName_rButton.AutoSize = true;
+            sortByName_rButton.Location = new Point(18, 21);
+            sortByName_rButton.Name = "sortByName_rButton";
+            sortByName_rButton.Size = new Size(150, 19);
+            sortByName_rButton.TabIndex = 0;
+            sortByName_rButton.Text = "Sort by name of subject";
+            sortByName_rButton.UseVisualStyleBackColor = true;
+            sortByName_rButton.CheckedChanged += sort_CheckedChanged;
             // 
             // tabPage2
             // 
@@ -422,6 +429,7 @@
             // 
             // addRow_Button
             // 
+            addRow_Button.Enabled = false;
             addRow_Button.FlatStyle = FlatStyle.Flat;
             addRow_Button.Location = new Point(240, 399);
             addRow_Button.Name = "addRow_Button";
@@ -433,6 +441,7 @@
             // 
             // deleteRow_Button
             // 
+            deleteRow_Button.Enabled = false;
             deleteRow_Button.FlatStyle = FlatStyle.Flat;
             deleteRow_Button.Location = new Point(476, 399);
             deleteRow_Button.Name = "deleteRow_Button";
@@ -444,6 +453,7 @@
             // 
             // cancelEdit_Button
             // 
+            cancelEdit_Button.Enabled = false;
             cancelEdit_Button.FlatStyle = FlatStyle.Flat;
             cancelEdit_Button.Location = new Point(685, 399);
             cancelEdit_Button.Name = "cancelEdit_Button";
@@ -455,6 +465,7 @@
             // 
             // save_Button
             // 
+            save_Button.Enabled = false;
             save_Button.FlatStyle = FlatStyle.Flat;
             save_Button.Location = new Point(8, 399);
             save_Button.Name = "save_Button";
@@ -472,6 +483,7 @@
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.Size = new Size(878, 375);
             dataGridView1.TabIndex = 0;
+            dataGridView1.RowsAdded += dataGridView1_RowsAdded;
             // 
             // Form1
             // 
@@ -522,12 +534,12 @@
         private RadioButton createFileRadio;
         private DataGridView dataGridView2;
         private Label label2;
-        private Button button6;
-        private RadioButton radioButton9;
-        private RadioButton radioButton8;
-        private RadioButton radioButton7;
-        private RadioButton radioButton6;
-        private RadioButton radioButton5;
+        private Button sortButton;
+        private RadioButton sortByInfo_rButton;
+        private RadioButton sortByPermit_rButton;
+        private RadioButton sortByType_rButton;
+        private RadioButton SortByContract_rButton;
+        private RadioButton sortByName_rButton;
         private Button searchByParam_button;
         private RadioButton searchByInfo_rButton;
         private RadioButton searchByPermit_rButton;

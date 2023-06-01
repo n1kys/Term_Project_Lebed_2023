@@ -189,6 +189,34 @@ namespace Term_Project_Lebed_2023
             }
         }
 
+        private string ParseContractNumber(string contractAndDateValue)
+        {
+            string contractNumber = string.Empty;
+
+            // Регулярное выражение для поиска номера договора
+            string regexPattern = @"(?<=№\s?)(\d+\/?\d*)";
+            Match match = Regex.Match(contractAndDateValue, regexPattern);
+
+            if (match.Success)
+            {
+                contractNumber = match.Value;
+            }
+
+            return contractNumber;
+        }
+
+        private string GetCellValue(Cell cell, WorkbookPart workbookPart)
+        {
+            string cellValue = cell.InnerText;
+            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
+            {
+                SharedStringTablePart stringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().First();
+                cellValue = stringTablePart.SharedStringTable.ChildElements[int.Parse(cellValue)].InnerText;
+            }
+
+            return cellValue;
+        }
+
         public void addInfoToEmptyFile(ref DataGridView dgv)
         {
             // Очистка DataGridView
@@ -202,18 +230,6 @@ namespace Term_Project_Lebed_2023
             dgv.Columns.Add("Column4", "Інформація про рекламні засоби (адреса розміщення реклами)");
             dgv.Columns.Add("Column5", "№ дозволу, дата");
             dgv.Columns.Add("Column6", "Статус");
-        }
-
-        private string GetCellValue(Cell cell, WorkbookPart workbookPart)
-        {
-            string cellValue = cell.InnerText;
-            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
-            {
-                SharedStringTablePart stringTablePart = workbookPart.GetPartsOfType<SharedStringTablePart>().First();
-                cellValue = stringTablePart.SharedStringTable.ChildElements[int.Parse(cellValue)].InnerText;
-            }
-
-            return cellValue;
         }
 
         public void addInfoToDataGrid(ref DataGridView dgv)
@@ -236,7 +252,7 @@ namespace Term_Project_Lebed_2023
             {
                 AdvertisementData advertisementData = advertisementDataList[i];
 
-                if (advertisementData == null)
+                if (advertisementData == null || string.IsNullOrEmpty(advertisementData.SubjectName))
                     continue;
 
                 DataRow row = dataTable.NewRow();
@@ -247,11 +263,11 @@ namespace Term_Project_Lebed_2023
                 row["№ дозволу, дата"] = advertisementData.Permit;
 
                 // Определяем значение статуса в зависимости от наличия продления
-                if (advertisementData.ContinuationDate != DateTime.MinValue || 
-                        advertisementData.Contract.Contains("Продовжено") || 
-                        advertisementData.Contract.Contains("продовжено") || 
-                        advertisementData.Contract.Contains(",") || 
-                        advertisementData.Contract.Contains(";"))
+                if (advertisementData.ContinuationDate != DateTime.MinValue ||
+                    advertisementData.Contract.Contains("Продовжено") ||
+                    advertisementData.Contract.Contains("продовжено") ||
+                    advertisementData.Contract.Contains(",") ||
+                    advertisementData.Contract.Contains(";"))
                 {
                     string statusValue = "продовжено ";
                     row["Статус"] = statusValue;
@@ -431,7 +447,7 @@ namespace Term_Project_Lebed_2023
 
             foreach (DataGridViewRow row in dgv1.Rows)
             {
-                if (row.Cells["Інформація про рекламні засоби (адреса розміщення реклами)"].Value != null 
+                if (row.Cells["Інформація про рекламні засоби (адреса розміщення реклами)"].Value != null
                     && row.Cells["Інформація про рекламні засоби (адреса розміщення реклами)"].Value.ToString().Contains(searchText))
                 {
                     DataRow newRow = dataTable2.NewRow();
@@ -489,6 +505,283 @@ namespace Term_Project_Lebed_2023
                 MessageBox.Show("Совпадения в свойстве '№ дозволу, дата' не найдены.");
             }
         }
+
+        public void sortBySubject(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2)
+        {
+
+            List<string> columnValues = new List<string>();
+            int columnIndex = dgv1.Columns["Назва субєкта господарювання"].Index;
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells[columnIndex].Value != null && !string.IsNullOrWhiteSpace(row.Cells[columnIndex].Value.ToString()))
+                {
+                    columnValues.Add(row.Cells[columnIndex].Value.ToString());
+                }
+            }
+
+            // Сортируем список значений
+            columnValues.Sort();
+
+            // Создаем новую таблицу для отсортированных данных
+            DataTable sortedDataTable = new DataTable();
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                sortedDataTable.Columns.Add(column.Name, column.ValueType);
+            }
+
+            // Добавляем отсортированные строки в новую таблицу
+            foreach (string value in columnValues)
+            {
+                foreach (DataGridViewRow row in dgv1.Rows)
+                {
+                    if (row.Cells[columnIndex].Value != null && row.Cells[columnIndex].Value.ToString() == value)
+                    {
+                        DataRow newRow = sortedDataTable.NewRow();
+                        for (int i = 0; i < dgv1.Columns.Count; i++)
+                        {
+                            newRow[i] = row.Cells[i].Value;
+                        }
+                        sortedDataTable.Rows.Add(newRow);
+                    }
+                }
+            }
+
+            // Обновляем источник данных dgv2
+            dgv2.AutoGenerateColumns = true;
+            dgv2.DataSource = sortedDataTable;
+
+        }
+
+        public void sortByContract(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2)
+        {
+            // Получение списка уникальных номеров договоров
+            HashSet<string> contractNumbers = new HashSet<string>();
+
+            int columnIndex = dgv1.Columns["№ договору, дата"].Index;
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells[columnIndex].Value != null && !string.IsNullOrWhiteSpace(row.Cells[columnIndex].Value.ToString()))
+                {
+                    string contractAndDateValue = row.Cells[columnIndex].Value.ToString();
+                    string contractNumber = ParseContractNumber(contractAndDateValue);
+
+                    contractNumbers.Add(contractNumber);
+                }
+            }
+
+            // Создание новой таблицы для отсортированных данных
+            DataTable sortedDataTable = new DataTable();
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                sortedDataTable.Columns.Add(column.Name, column.ValueType);
+            }
+
+            // Сбор всех строк с соответствующими номерами договоров
+            List<DataGridViewRow> sortedRows = new List<DataGridViewRow>();
+            foreach (string contractNumber in contractNumbers)
+            {
+                foreach (DataGridViewRow row in dgv1.Rows)
+                {
+                    if (row.Cells[columnIndex].Value != null && !string.IsNullOrWhiteSpace(row.Cells[columnIndex].Value.ToString()))
+                    {
+                        string contractAndDateValue = row.Cells[columnIndex].Value.ToString();
+                        string currentContractNumber = ParseContractNumber(contractAndDateValue);
+
+                        if (currentContractNumber == contractNumber)
+                        {
+                            sortedRows.Add(row);
+                        }
+                    }
+                }
+            }
+
+            // Сортировка строк по номеру договора
+            sortedRows.Sort((row1, row2) =>
+            {
+                string contractAndDateValue1 = row1.Cells[columnIndex].Value.ToString();
+                string contractNumber1 = ParseContractNumber(contractAndDateValue1);
+
+                string contractAndDateValue2 = row2.Cells[columnIndex].Value.ToString();
+                string contractNumber2 = ParseContractNumber(contractAndDateValue2);
+
+                return string.Compare(contractNumber1, contractNumber2);
+            });
+
+            // Добавление отсортированных строк в новую таблицу
+            foreach (DataGridViewRow sortedRow in sortedRows)
+            {
+                DataRow newRow = sortedDataTable.NewRow();
+                for (int i = 0; i < dgv1.Columns.Count; i++)
+                {
+                    newRow[i] = sortedRow.Cells[i].Value;
+                }
+                sortedDataTable.Rows.Add(newRow);
+            }
+
+            // Обновление источника данных dgv2
+            dgv2.AutoGenerateColumns = true;
+            dgv2.DataSource = sortedDataTable;
+        }
+
+        public void sortByType(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2)
+        {
+            List<string> columnValues = new List<string>();
+            int columnIndex = dgv1.Columns["Тип зовнішньої реклами"].Index;
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells[columnIndex].Value != null && !string.IsNullOrWhiteSpace(row.Cells[columnIndex].Value.ToString()))
+                {
+                    columnValues.Add(row.Cells[columnIndex].Value.ToString());
+                }
+            }
+
+            // Сортируем список значений
+            columnValues.Sort();
+
+            // Создаем новую таблицу для отсортированных данных
+            DataTable sortedDataTable = new DataTable();
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                sortedDataTable.Columns.Add(column.Name, column.ValueType);
+            }
+
+            // Добавляем отсортированные строки в новую таблицу
+            foreach (string value in columnValues)
+            {
+                foreach (DataGridViewRow row in dgv1.Rows)
+                {
+                    if (row.Cells[columnIndex].Value != null && row.Cells[columnIndex].Value.ToString() == value)
+                    {
+                        DataRow newRow = sortedDataTable.NewRow();
+                        for (int i = 0; i < dgv1.Columns.Count; i++)
+                        {
+                            newRow[i] = row.Cells[i].Value;
+                        }
+                        sortedDataTable.Rows.Add(newRow);
+                    }
+                }
+            }
+
+            // Обновляем источник данных dgv2
+            dgv2.AutoGenerateColumns = true;
+            dgv2.DataSource = sortedDataTable;
+        }
+
+        public void sortByInfo(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2)
+        {
+            List<string> columnValues = new List<string>();
+            int columnIndex = dgv1.Columns["Інформація про рекламні засоби (адреса розміщення реклами)"].Index;
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells[columnIndex].Value != null && !string.IsNullOrWhiteSpace(row.Cells[columnIndex].Value.ToString()))
+                {
+                    columnValues.Add(row.Cells[columnIndex].Value.ToString());
+                }
+            }
+
+            // Сортируем список значений
+            columnValues.Sort();
+
+            // Создаем новую таблицу для отсортированных данных
+            DataTable sortedDataTable = new DataTable();
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                sortedDataTable.Columns.Add(column.Name, column.ValueType);
+            }
+
+            // Добавляем отсортированные строки в новую таблицу
+            foreach (string value in columnValues)
+            {
+                foreach (DataGridViewRow row in dgv1.Rows)
+                {
+                    if (row.Cells[columnIndex].Value != null && row.Cells[columnIndex].Value.ToString() == value)
+                    {
+                        DataRow newRow = sortedDataTable.NewRow();
+                        for (int i = 0; i < dgv1.Columns.Count; i++)
+                        {
+                            newRow[i] = row.Cells[i].Value;
+                        }
+                        sortedDataTable.Rows.Add(newRow);
+                    }
+                }
+            }
+
+            // Обновляем источник данных dgv2
+            dgv2.AutoGenerateColumns = true;
+            dgv2.DataSource = sortedDataTable;
+        }
+
+        public void sortByPermit(ref DataGridView dgv1, ref DataGridView dgv2, ref DataTable dataTable2)
+        {
+            // Получение списка уникальных номеров договоров
+            HashSet<string> permitNumbers = new HashSet<string>();
+
+            int columnIndex = dgv1.Columns["№ дозволу, дата"].Index;
+            foreach (DataGridViewRow row in dgv1.Rows)
+            {
+                if (row.Cells[columnIndex].Value != null && !string.IsNullOrWhiteSpace(row.Cells[columnIndex].Value.ToString()))
+                {
+                    string permitAndDateValue = row.Cells[columnIndex].Value.ToString();
+                    string permitNumber = ParseContractNumber(permitAndDateValue);
+
+                    permitNumbers.Add(permitNumber);
+                }
+            }
+
+            // Создание новой таблицы для отсортированных данных
+            DataTable sortedDataTable = new DataTable();
+            foreach (DataGridViewColumn column in dgv1.Columns)
+            {
+                sortedDataTable.Columns.Add(column.Name, column.ValueType);
+            }
+
+            // Сбор всех строк с соответствующими номерами договоров
+            List<DataGridViewRow> sortedRows = new List<DataGridViewRow>();
+            foreach (string permitNumber in permitNumbers)
+            {
+                foreach (DataGridViewRow row in dgv1.Rows)
+                {
+                    if (row.Cells[columnIndex].Value != null && !string.IsNullOrWhiteSpace(row.Cells[columnIndex].Value.ToString()))
+                    {
+                        string permitAndDateValue = row.Cells[columnIndex].Value.ToString();
+                        string currentPermitNumber = ParseContractNumber(permitAndDateValue);
+
+                        if (currentPermitNumber == permitNumber)
+                        {
+                            sortedRows.Add(row);
+                        }
+                    }
+                }
+            }
+
+            // Сортировка строк по номеру договора
+            sortedRows.Sort((row1, row2) =>
+            {
+                string permitAndDateValue1 = row1.Cells[columnIndex].Value.ToString();
+                string permitNumber1 = ParseContractNumber(permitAndDateValue1);
+
+                string permitAndDateValue2 = row2.Cells[columnIndex].Value.ToString();
+                string permitNumber2 = ParseContractNumber(permitAndDateValue2);
+
+                return string.Compare(permitNumber1, permitNumber2);
+            });
+
+            // Добавление отсортированных строк в новую таблицу
+            foreach (DataGridViewRow sortedRow in sortedRows)
+            {
+                DataRow newRow = sortedDataTable.NewRow();
+                for (int i = 0; i < dgv1.Columns.Count; i++)
+                {
+                    newRow[i] = sortedRow.Cells[i].Value;
+                }
+                sortedDataTable.Rows.Add(newRow);
+            }
+
+            // Обновление источника данных dgv2
+            dgv2.AutoGenerateColumns = true;
+            dgv2.DataSource = sortedDataTable;
+        }
+
     }
 
 }

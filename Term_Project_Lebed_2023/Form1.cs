@@ -43,6 +43,30 @@ namespace Term_Project_Lebed_2023
 
         }
 
+        private void sort_CheckedChanged(object sender, EventArgs e)
+        {
+            sortButton.Enabled = sortByName_rButton.Checked || SortByContract_rButton.Checked
+                || sortByType_rButton.Checked || sortByInfo_rButton.Checked || sortByPermit_rButton.Checked;
+        }
+
+        private void CheckDataGridViewNotEmpty(ref DataGridView dataGridView1, Button saveButton, Button deleteButton, Button addButton, Button cancelButtton)
+        {
+            if (dataGridView1.Rows.Count > 0)
+            {
+                saveButton.Enabled = true;
+                deleteButton.Enabled = true;
+                addButton.Enabled = true;
+                cancelButtton.Enabled = true;
+            }
+            else
+            {
+                saveButton.Enabled = false;
+                deleteButton.Enabled = false;
+                addButton.Enabled = false;
+                cancelButtton.Enabled = false;
+            }
+        }
+
         private void searchTextBox_TextChanged(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(searchTextBox.Text))
@@ -333,27 +357,54 @@ namespace Term_Project_Lebed_2023
             {
                 data.searchBySubject(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
             }
-            if(searchByContract_rButton.Checked)
+            if (searchByContract_rButton.Checked)
             {
                 data.searchByContract(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
             }
-            if(searchByType_rButton.Checked)
+            if (searchByType_rButton.Checked)
             {
                 data.searchByType(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
             }
             if (searchByInfo_rButton.Checked)
             {
-                data.searchByInfo(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);    
+                data.searchByInfo(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
             }
-            if(searchByPermit_rButton.Checked)
+            if (searchByPermit_rButton.Checked)
             {
                 data.searchByPermit(ref dataGridView1, ref dataGridView2, ref dataTable2, searchText);
             }
         }
 
+        private void sortButton_Click(object sender, EventArgs e)
+        {
+            WorkWithAdvertismentData data = new WorkWithAdvertismentData();
+            DataTable dataTable2 = originalTable.Copy();
 
+            if (sortByName_rButton.Checked)
+            {
+                data.sortBySubject(ref dataGridView1, ref dataGridView2, ref dataTable2);
+            }
+            if (SortByContract_rButton.Checked)
+            {
+                data.sortByContract(ref dataGridView1, ref dataGridView2, ref dataTable2);
+            }
+            if (sortByType_rButton.Checked)
+            {
+                data.sortByType(ref dataGridView1, ref dataGridView2, ref dataTable2);
+            }
+            if (sortByInfo_rButton.Checked)
+            {
+                data.sortByInfo(ref dataGridView1, ref dataGridView2, ref dataTable2);
+            }
+            if (sortByPermit_rButton.Checked)
+            {
+                data.sortByPermit(ref dataGridView1, ref dataGridView2, ref dataTable2);
+            }
+        }
 
-
-
+        private void dataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            CheckDataGridViewNotEmpty(ref dataGridView1, save_Button, addRow_Button, deleteRow_Button, cancelEdit_Button);
+        }
     }
 }
